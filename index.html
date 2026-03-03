@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>My To-Do App</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a1a2e">
   <style>
     :root {
       --bg-primary: #1a1a2e;
@@ -44,6 +46,81 @@
       color: var(--text-primary);
       font-family: 'Segoe UI', sans-serif;
       padding: 20px;
+      padding-bottom: 80px;
+    }
+
+    .install-banner {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: white;
+      padding: 14px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 8px 24px rgba(233,69,96,0.4);
+      animation: bounce 1.5s infinite;
+      white-space: nowrap;
+      border: none;
+    }
+
+    .ios-banner {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      padding: 14px 20px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 500;
+      z-index: 999;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      text-align: center;
+      width: 90%;
+      max-width: 340px;
+    }
+
+    .ios-banner strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: var(--info);
+    }
+
+    .ios-close {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+      padding: 0;
+      animation: none;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
 
     .header {
@@ -54,7 +131,7 @@
     }
 
     .header h1 {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
       color: var(--text-primary);
     }
@@ -136,6 +213,30 @@
       border: 1px solid var(--border);
     }
 
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
     .input-row {
       display: flex;
       gap: 10px;
@@ -153,9 +254,7 @@
       outline: none;
     }
 
-    .input-row input::placeholder {
-      color: var(--text-secondary);
-    }
+    .input-row input::placeholder { color: var(--text-secondary); }
 
     .add-btn {
       background: var(--accent);
@@ -183,22 +282,30 @@
       cursor: pointer;
     }
 
-    .priority-btn.active-high {
-      border-color: #e94560;
-      color: #e94560;
-      background: rgba(233,69,96,0.1);
+    .priority-btn.active-high { border-color: #e94560; color: #e94560; background: rgba(233,69,96,0.1); }
+    .priority-btn.active-medium { border-color: #f6ad55; color: #f6ad55; background: rgba(246,173,85,0.1); }
+    .priority-btn.active-low { border-color: #68d391; color: #68d391; background: rgba(104,211,145,0.1); }
+
+    /* Goal Form */
+    .goal-form { display: none; }
+    .goal-form input, .goal-form .input-row input { margin-bottom: 10px; }
+
+    .goal-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
     }
 
-    .priority-btn.active-medium {
-      border-color: #f6ad55;
-      color: #f6ad55;
-      background: rgba(246,173,85,0.1);
-    }
-
-    .priority-btn.active-low {
-      border-color: #68d391;
-      color: #68d391;
-      background: rgba(104,211,145,0.1);
+    .goal-inputs input {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      color: var(--text-primary);
+      font-size: 14px;
+      outline: none;
+      width: 100%;
     }
 
     .tasks-header {
@@ -208,10 +315,7 @@
       margin-bottom: 12px;
     }
 
-    .tasks-header h2 {
-      font-size: 16px;
-      color: var(--text-secondary);
-    }
+    .tasks-header h2 { font-size: 16px; color: var(--text-secondary); }
 
     .clear-btn {
       background: transparent;
@@ -234,16 +338,14 @@
       background: var(--bg-secondary);
       border-radius: 14px;
       padding: 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
       border: 1px solid var(--border);
       animation: slideIn 0.3s ease;
     }
 
-    @keyframes slideIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+    .task-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
     .task-checkbox {
@@ -264,9 +366,7 @@
       border-color: var(--success);
     }
 
-    .task-content {
-      flex: 1;
-    }
+    .task-content { flex: 1; }
 
     .task-text {
       font-size: 15px;
@@ -297,8 +397,70 @@
       padding: 4px 8px;
     }
 
-    .delete-btn:hover {
-      color: var(--accent);
+    /* Goal Progress */
+    .goal-progress {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .goal-progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .goal-progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--border);
+      border-radius: 50px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .goal-progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, #e94560, #68d391);
+      border-radius: 50px;
+      transition: width 0.5s ease;
+    }
+
+    .goal-update-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .goal-update-row input {
+      flex: 1;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text-primary);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .goal-update-btn {
+      background: var(--info);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .goal-motivate {
+      font-size: 12px;
+      color: var(--success);
+      margin-top: 6px;
+      font-weight: 600;
     }
 
     .empty-state {
@@ -307,10 +469,7 @@
       color: var(--text-secondary);
     }
 
-    .empty-state .icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
 
     .copyright {
       text-align: center;
@@ -319,7 +478,6 @@
       padding: 20px 0 10px;
     }
 
-    /* Popup */
     .popup-overlay {
       display: none;
       position: fixed;
@@ -331,9 +489,7 @@
       justify-content: center;
     }
 
-    .popup-overlay.show {
-      display: flex;
-    }
+    .popup-overlay.show { display: flex; }
 
     .popup-box {
       background: var(--bg-secondary);
@@ -345,27 +501,9 @@
       animation: popIn 0.4s ease;
     }
 
-    @keyframes popIn {
-      from { transform: scale(0.5); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    .popup-box .emoji {
-      font-size: 56px;
-      margin-bottom: 16px;
-    }
-
-    .popup-box h2 {
-      font-size: 22px;
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-
-    .popup-box p {
-      color: var(--text-secondary);
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
+    .popup-box .emoji { font-size: 56px; margin-bottom: 16px; }
+    .popup-box h2 { font-size: 22px; color: var(--text-primary); margin-bottom: 8px; }
+    .popup-box p { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
 
     .popup-close {
       background: var(--accent);
@@ -379,6 +517,16 @@
   </style>
 </head>
 <body>
+
+  <button class="install-banner" id="installBtn" onclick="installApp()">
+    📲 Install My To-Do App
+  </button>
+
+  <div class="ios-banner" id="iosBanner">
+    <button class="ios-close" onclick="closeIosBanner()">✕</button>
+    <strong>📲 Install on iPhone/iPad</strong>
+    Tap the Share button (⬆️) in Safari then tap "Add to Home Screen" to install this app
+  </div>
 
   <div class="header">
     <h1>My To-Do App</h1>
@@ -402,7 +550,7 @@
 
   <div class="progress-container">
     <div class="progress-label">
-      <span>Progress</span>
+      <span>Overall Progress</span>
       <span id="progressPercent">0%</span>
     </div>
     <div class="progress-bar">
@@ -411,49 +559,108 @@
   </div>
 
   <div class="input-container">
-    <div class="input-row">
-      <input type="text" id="taskInput" placeholder="Add a new task..." />
-      <button class="add-btn" onclick="addTask()">+</button>
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-task" onclick="setTab('task')">📝 Add Task</button>
+      <button class="tab-btn" id="tab-goal" onclick="setTab('goal')">🎯 Add Goal</button>
     </div>
-    <div class="priority-row">
-      <button class="priority-btn active-high" id="btn-high" onclick="setPriority('high')">🔴 High</button>
-      <button class="priority-btn" id="btn-medium" onclick="setPriority('medium')">🟡 Medium</button>
-      <button class="priority-btn" id="btn-low" onclick="setPriority('low')">🟢 Low</button>
+
+    <!-- Task Form -->
+    <div id="taskForm">
+      <div class="input-row">
+        <input type="text" id="taskInput" placeholder="Add a new task..." />
+        <button class="add-btn" onclick="addTask()">+</button>
+      </div>
+      <div class="priority-row">
+        <button class="priority-btn active-high" id="btn-high" onclick="setPriority('high')">🔴 High</button>
+        <button class="priority-btn" id="btn-medium" onclick="setPriority('medium')">🟡 Medium</button>
+        <button class="priority-btn" id="btn-low" onclick="setPriority('low')">🟢 Low</button>
+      </div>
+    </div>
+
+    <!-- Goal Form -->
+    <div id="goalForm" class="goal-form">
+      <div class="input-row">
+        <input type="text" id="goalInput" placeholder="Goal name e.g. Save for Christmas..." />
+        <button class="add-btn" onclick="addGoal()">+</button>
+      </div>
+      <div class="goal-inputs">
+        <input type="number" id="goalTarget" placeholder="Target e.g. 100000" />
+        <input type="text" id="goalUnit" placeholder="Unit e.g. ₦, kg, pages" />
+      </div>
     </div>
   </div>
 
   <div class="tasks-header">
-    <h2>Your Tasks</h2>
+    <h2>Your Tasks & Goals</h2>
     <button class="clear-btn" onclick="clearCompleted()">Clear Completed</button>
   </div>
 
   <div class="task-list" id="taskList"></div>
 
-  <div class="copyright">© 2025 TeaJay Konsult. All rights reserved.</div>
+  <div class="copyright">© 2026 TeaJay Konsult Ltd. All rights reserved.</div>
 
-  <!-- Celebration Popup -->
   <div class="popup-overlay" id="celebrationPopup">
     <div class="popup-box">
-      <div class="emoji">🎉</div>
-      <h2>Goal Achieved!</h2>
-      <p>Congratulations! You've crushed another task. Keep going, you're on fire! 🔥</p>
+      <div class="emoji" id="popupEmoji">🎉</div>
+      <h2 id="popupTitle">Goal Achieved!</h2>
+      <p id="popupMessage">Congratulations! You've crushed another task. Keep going, you're on fire! 🔥</p>
       <button class="popup-close" onclick="closePopup()">Thank You!</button>
     </div>
   </div>
 
 <script>
-  let tasks = JSON.parse(localStorage.getItem('teajay-tasks')) || [];
+  let tasks = JSON.parse(localStorage.getItem('teajay-tasks-v2')) || [];
   let selectedPriority = 'high';
   let isLight = false;
+  let deferredPrompt = null;
+  let currentTab = 'task';
+
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches;
+
+  if (isIOS && !isInStandaloneMode) {
+    document.getElementById('iosBanner').style.display = 'block';
+  }
+
+  function closeIosBanner() {
+    document.getElementById('iosBanner').style.display = 'none';
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBtn').style.display = 'block';
+  });
+
+  window.addEventListener('appinstalled', () => {
+    document.getElementById('installBtn').style.display = 'none';
+    deferredPrompt = null;
+  });
+
+  async function installApp() {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    if (result.outcome === 'accepted') document.getElementById('installBtn').style.display = 'none';
+    deferredPrompt = null;
+  }
 
   function saveTasks() {
-    localStorage.setItem('teajay-tasks', JSON.stringify(tasks));
+    localStorage.setItem('teajay-tasks-v2', JSON.stringify(tasks));
   }
 
   function toggleTheme() {
     isLight = !isLight;
     document.body.classList.toggle('light', isLight);
     document.getElementById('themeBtn').textContent = isLight ? '🌙' : '☀️';
+  }
+
+  function setTab(tab) {
+    currentTab = tab;
+    document.getElementById('tab-task').classList.toggle('active', tab === 'task');
+    document.getElementById('tab-goal').classList.toggle('active', tab === 'goal');
+    document.getElementById('taskForm').style.display = tab === 'task' ? 'block' : 'none';
+    document.getElementById('goalForm').style.display = tab === 'goal' ? 'block' : 'none';
   }
 
   function setPriority(level) {
@@ -468,17 +675,68 @@
     const input = document.getElementById('taskInput');
     const text = input.value.trim();
     if (!text) return;
-    tasks.unshift({ id: Date.now(), text, priority: selectedPriority, completed: false });
+    tasks.unshift({
+      id: Date.now(),
+      type: 'task',
+      text,
+      priority: selectedPriority,
+      completed: false
+    });
     input.value = '';
     saveTasks();
     renderTasks();
   }
 
-  function toggleTask(id) {
+  function addGoal() {
+    const name = document.getElementById('goalInput').value.trim();
+    const target = parseFloat(document.getElementById('goalTarget').value);
+    const unit = document.getElementById('goalUnit').value.trim() || '';
+    if (!name || isNaN(target) || target <= 0) return;
+    tasks.unshift({
+      id: Date.now(),
+      type: 'goal',
+      text: name,
+      target,
+      current: 0,
+      unit,
+      completed: false
+    });
+    document.getElementById('goalInput').value = '';
+    document.getElementById('goalTarget').value = '';
+    document.getElementById('goalUnit').value = '';
+    saveTasks();
+    renderTasks();
+  }
+
+  function updateGoalProgress(id, value) {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
+    const amount = parseFloat(value);
+    if (isNaN(amount) || amount < 0) return;
+    task.current = Math.min(amount, task.target);
+    if (task.current >= task.target) {
+      task.completed = true;
+      showPopup('🏆', 'Goal Achieved!', `Amazing! You've reached your goal of ${task.target}${task.unit ? ' ' + task.unit : ''}. You are absolutely unstoppable! 🔥`);
+    }
+    saveTasks();
+    renderTasks();
+  }
+
+  function getMotivationalMessage(percent) {
+    if (percent >= 90) return "🔥 Almost there! You're unstoppable!";
+    if (percent >= 75) return "💪🏾 Great progress! Keep pushing!";
+    if (percent >= 50) return "👏🏾 Halfway there! You can do this!";
+    if (percent >= 25) return "🚀 Good start! Keep going!";
+    return "💡 Every step counts! You've got this!";
+  }
+
+  function toggleTask(id) {
+    const task = tasks.find(t => t.id === id);
+    if (!task || task.type === 'goal') return;
     task.completed = !task.completed;
-    if (task.completed) showCelebration();
+    if (task.completed) {
+      showPopup('🎉', 'Task Completed!', "Congratulations! You've crushed another task. Keep going, you're on fire! 🔥");
+    }
     saveTasks();
     renderTasks();
   }
@@ -495,7 +753,10 @@
     renderTasks();
   }
 
-  function showCelebration() {
+  function showPopup(emoji, title, message) {
+    document.getElementById('popupEmoji').textContent = emoji;
+    document.getElementById('popupTitle').textContent = title;
+    document.getElementById('popupMessage').textContent = message;
     document.getElementById('celebrationPopup').classList.add('show');
   }
 
@@ -518,31 +779,76 @@
   function renderTasks() {
     const list = document.getElementById('taskList');
     updateStats();
+
     if (tasks.length === 0) {
-      list.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>No tasks yet. Add one above!</p></div>`;
+      list.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>No tasks or goals yet. Add one above!</p></div>`;
       return;
     }
-    list.innerHTML = tasks.map(task => `
-      <div class="task-item">
-        <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})">
-          ${task.completed ? '✓' : ''}
-        </div>
-        <div class="task-content">
-          <div class="task-text ${task.completed ? 'completed' : ''}">${task.text}</div>
-          <div class="task-priority priority-${task.priority}">
-            ${task.priority === 'high' ? '🔴 High Priority' : task.priority === 'medium' ? '🟡 Medium Priority' : '🟢 Low Priority'}
+
+    list.innerHTML = tasks.map(task => {
+      if (task.type === 'goal') {
+        const percent = task.target > 0 ? Math.round((task.current / task.target) * 100) : 0;
+        const motivate = getMotivationalMessage(percent);
+        return `
+          <div class="task-item">
+            <div class="task-top">
+              <div class="task-checkbox ${task.completed ? 'checked' : ''}">
+                ${task.completed ? '✓' : '🎯'}
+              </div>
+              <div class="task-content">
+                <div class="task-text ${task.completed ? 'completed' : ''}">${task.text}</div>
+                <div class="task-priority priority-high">🎯 Goal Track</div>
+              </div>
+              <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
+            </div>
+            <div class="goal-progress">
+              <div class="goal-progress-header">
+                <span>${task.current}${task.unit ? ' ' + task.unit : ''} of ${task.target}${task.unit ? ' ' + task.unit : ''}</span>
+                <span>${percent}%</span>
+              </div>
+              <div class="goal-progress-bar">
+                <div class="goal-progress-fill" style="width:${percent}%"></div>
+              </div>
+              <div class="goal-motivate">${motivate}</div>
+              ${!task.completed ? `
+              <div class="goal-update-row">
+                <input type="number" id="goalUpdate_${task.id}" placeholder="Update progress..." />
+                <button class="goal-update-btn" onclick="updateGoalProgress(${task.id}, document.getElementById('goalUpdate_${task.id}').value)">Update</button>
+              </div>` : ''}
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="task-item">
+          <div class="task-top">
+            <div class="task-checkbox ${task.completed ? 'checked' : ''}" onclick="toggleTask(${task.id})">
+              ${task.completed ? '✓' : ''}
+            </div>
+            <div class="task-content">
+              <div class="task-text ${task.completed ? 'completed' : ''}">${task.text}</div>
+              <div class="task-priority priority-${task.priority}">
+                ${task.priority === 'high' ? '🔴 High Priority' : task.priority === 'medium' ? '🟡 Medium Priority' : '🟢 Low Priority'}
+              </div>
+            </div>
+            <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
           </div>
         </div>
-        <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   document.getElementById('taskInput').addEventListener('keypress', function(e) {
     if (e.key === 'Enter') addTask();
   });
 
+  setTab('task');
   renderTasks();
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
 </script>
 
 </body>
