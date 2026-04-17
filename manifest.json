@@ -1,18 +1,25 @@
-```json
 {
   "name": "My To-Do App",
-  "short_name": "To-Do App",
-  "start_url": "index.html",
+  "short_name": "ToDoApp",
+  "description": "Manage tasks and goals with progress tracking. By TeaJay Konsult.",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#1a1a2e",
   "theme_color": "#1a1a2e",
+  "background_color": "#1a1a2e",
   "orientation": "portrait",
+  "scope": "/",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/900/900618.png",
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
-```
