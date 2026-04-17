@@ -1,0 +1,18 @@
+```json
+{
+  "name": "My To-Do App",
+  "short_name": "To-Do App",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#1a1a2e",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/900/900618.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+```
