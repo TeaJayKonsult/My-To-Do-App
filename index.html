@@ -526,7 +526,7 @@
     Tap the Share button (⬆️) in Safari then tap "Add to Home Screen" to install this app
   </div>
 
-  <!-- Permanent install button (small, centered, always visible) -->
+  <!-- Permanent install button (initially visible, hidden after installation) -->
   <button class="perm-install-btn" id="installBtn">📲 Install App</button>
 
   <div class="header">
@@ -627,26 +627,38 @@
     document.getElementById('iosBanner').style.display = 'none';
   }
 
-  // PWA install event listener
+  // ==================== IMPROVED INSTALL BUTTON LOGIC ====================
+  const installBtn = document.getElementById('installBtn');
+
+  // If app is already installed (standalone mode), hide the install button permanently
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (installBtn) installBtn.style.display = 'none';
+  }
+
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    // Button already visible, just store the prompt
+    console.log('beforeinstallprompt fired');
+    if (installBtn && !window.matchMedia('(display-mode: standalone)').matches) {
+      installBtn.style.display = 'flex';
+    }
   });
 
   window.addEventListener('appinstalled', () => {
+    console.log('App installed successfully');
     deferredPrompt = null;
-    console.log('App installed');
+    if (installBtn) installBtn.style.display = 'none';
   });
 
-  // Install button handler (permanent button)
-  window.installApp = async function() {
+  async function installApp() {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
-        deferredPrompt = null;
+        console.log('User accepted install');
+        if (installBtn) installBtn.style.display = 'none';
       }
+      deferredPrompt = null;
     } else {
       let instructions = '';
       if (/android/i.test(navigator.userAgent)) {
@@ -658,9 +670,9 @@
       }
       alert(`📲 Install My To-Do App:\n\n${instructions}\n\nIf you just opened the app, wait a few seconds and try again.`);
     }
-  };
-
-  document.getElementById('installBtn').addEventListener('click', window.installApp);
+  }
+  if (installBtn) installBtn.addEventListener('click', installApp);
+  // =======================================================================
 
   function saveTasks() {
     localStorage.setItem('teajay-tasks-v2', JSON.stringify(tasks));
@@ -864,9 +876,10 @@
   renderTasks();
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered'))
+      .catch(err => console.log('SW error', err));
   }
 </script>
-
 </body>
 </html>
